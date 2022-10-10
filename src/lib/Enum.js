@@ -15,11 +15,17 @@
   * along with this program.  If not, see <http://www.gnu.org/licenses/>.
   */
 
+/*
+ * ASCII-ART
+ * https://patorjk.com/software/taag/#p=display&c=c&f=ANSI%20Shadow
+ * Basic
+ */
+
 'use strict';
 
 class Enum extends ParameterSeparator {
 
-    static EnumEntry = class EnumEntry {
+    static EnumItem = class EnumItem {
 
         [Symbol.toPrimitive](hint) {
             switch (hint) {
@@ -33,14 +39,14 @@ class Enum extends ParameterSeparator {
         };
 
         /**
-         * Erzeugt ein Eintrag vom Typ EnumEntry für das Enum-Objekt.
+         * Erzeugt ein Eintrag vom Typ EnumItem für das Enum-Objekt.
          * 
-         * @param {String} name der Name des EnumEntry
+         * @param {String} name der Name des EnumItem
          * @param {String} ouid ein String mit der OUID
-         * @param {Integer} index der Index der als Zahl den EnumEntry repräsentiert
+         * @param {Integer} index der Index der als Zahl den EnumItem repräsentiert
          * @param {String} enumType der Name des Types
          * @param {Enum} enumObject Das HerkunftsObjekt des EnumTypes
-         * @returns {EnumEntry} Das geschützte Objekt
+         * @returns {EnumItem} Das geschützte Objekt
          */
         constructor(name, ouid, index, initValue = false) {
             const parentClass = this.constructor.parentClass;
@@ -63,27 +69,6 @@ class Enum extends ParameterSeparator {
             });
         }
     }
-
-    /***************************
-     * Universally Unique Identifier 
-     *  Ein Universally Unique Identifier (UUID) ist ein Standard 
-     *  für Identifikatoren, der in der Softwareentwicklung verwendet 
-     *  wird. Er ist von der Open Software Foundation (OSF) als Teil 
-     *  des Distributed Computing Environment (DCE) standardisiert. 
-     *  Die Absicht hinter UUIDs ist, Informationen in verteilten 
-     *  Systemen ohne zentrale Koordination eindeutig kennzeichnen zu können.
-     *  Wird in diesem Fall durch die javascript-Bibliothek des 
-     *  Browsers erzeugt. Dies wird z.Z. nicht genutzt.
-     * 
-     * Own Unique Identifier (OUID)
-     *  Wird hier durch eine eigene Methode erzeugt und kann durch
-     *  Template gesteuert werden. Die Erzeugten IDs sind in einer
-     *  EnumType aufsteigend sortierbar wie die erzeugten Index
-     * 
-     * Hash HASH
-     *  Erzeugt mit einer eingenen Methode eine 32-Bit Zahl des Namen
-     *      Name: 'Enum:${enumType}.EnumEntry:${name}'
-     */
 
     /**
      * @static generateOUID(template)
@@ -155,6 +140,25 @@ class Enum extends ParameterSeparator {
         })(nUid);
     }
 
+    static DefaultOption = {
+        option: 'OPTION',
+        enumType: this.shortID('anonym'),
+        countType: undefined,
+        startNumber: 0,
+        ouidTemplate: 'yxxxx-xxxU-ENUM-Dxxx-Kxxx'
+    };
+
+    static {
+        // init Class EnumItem
+        this.EnumItem.parentClass = this;
+        const IndexType = new Enum(
+            { option: 'option', enumType: 'IndexType' },
+            'AUTO', 'BINARY', 'COUNT');
+        this.AUTO = IndexType.AUTO;
+        this.BINARY = IndexType.BINARY;
+        this.COUNT = IndexType.COUNT;
+        this.DefaultOption.countType = IndexType.AUTO;
+    }
 
     static GetProperty(staticSelf, PropName, value, enumerable = true) {
         Object.defineProperty(staticSelf, PropName, {
@@ -166,67 +170,6 @@ class Enum extends ParameterSeparator {
         });
     }
 
-    static DefaultOption = {
-        option: 'OPTION',
-        enumType: this.shortID('anonym'),
-        countType: undefined,
-        // idType: undefined,
-        startNumber: 0,
-        ouidTemplate: 'yxxxx-xxxU-ENUM-Dxxx-Kxxx'
-    };
-
-    static {
-        // init Class EnumEntry
-        this.EnumEntry.parentClass = this;
-        const IndexType = new Enum(
-            { option: 'option', enumType: 'IndexType' },
-            'AUTO', 'BINARY', 'COUNT');
-        this.AUTO = IndexType.AUTO;
-        this.BINARY = IndexType.BINARY;
-        this.COUNT = IndexType.COUNT;
-        // const IDType = new Enum(
-        //     {option: 'option', enumType: 'IDType'}, 
-        //     'HASH', 'UUID', 'OUID');
-        // this.HASH = IDType.HASH;
-        // this.UUID = IDType.UUID;
-        // this.OUID = IDType.OUID;
-        // this.DefaultOption.countType = IndexType.AUTO;
-        // this.DefaultOption.idType = IDType.HASH;
-        // this.Creator = {
-        //     [IDType.HASH]: (msg) => {},
-        //     [IDType.UUID]: () => {},
-        //     [IDType.OUID]: () => {}
-        // };
-        // this.GetCreator = this.Creator[this.DefaultOption.idType];
-    }
-
-    /*
-     * erzeugt ein Enum-Object mit der Hilfe der Parameter
-     * 
-     * @property {String-Array} names
-     *  Liste mit den zu erzeugenden Enum-Entries
-     * @property {String} enumType      
-     *  Name des EnumTypes
-     * @property {Bool} countType
-     *  Gibt den Indextype an
-     *      false => index = 0, 1, 2, 3, ... - n (Anzahl der Namen)
-     *      true => index = 1, 2, 4, 8, ...
-     * @property {Integer} startNumber
-     *  1. countType == false
-     *      gibt den Offset zum Index an
-     *      startNumber 2 => index = 2, 3, 4, ...
-     *  2. countType == true gibt die Startexponent zur Basis 2 an
-     *      Beispiel: startNumber 2 -> 2 ** startNumber 
-     *      => index = 4, 8, 16, ...
-    //  * @property {EnumEntry.HASH|UUID|OUID} idType
-    //  *  true => die OUID wird mit dem crypto-Modul des Browsers erstellt
-     * @property {String} ouidTemplate 
-    //  *  idType == EnumEntry.OUID => die OUID wird mit der eingebauten Funktion nach 
-    //  *      dem vorgegebenen oder dem Template erstellt
-     * 
-     * @returns {Enum} Object vom Typ Enum
-     */
-
     /**
      * Gibt ein Enum-Objekt zurück
      * 
@@ -234,9 +177,9 @@ class Enum extends ParameterSeparator {
      * @param  {...any} parameter 
      *  [
      *    <@optional @param option 
-     *      <@type {String, Object} Key == 'option', Options {hubble: any, ...}>| 
+     *      <@type {String} Key == 'option', Options {hubble: any, ...}> | 
      *      <@type {Object} Options  {option: [any], hubble: any, ...}>,
-     *    @param {String,...|Array|Set|Map|Array[Array]|Object} names Parameterliste
+     *    @param {String,... || Array || Set || Map || Array[Array] || Object} names Parameterliste
      *      @type {String, ...} aus Strings:        'foo', 'bar', ...
      *      @type {Array} aus Strings:              ['foo', 'bar', ...]
      *      @type {Set} aus einem Set-Objekt:       Set(['foo', 'bar', ...])
@@ -254,7 +197,7 @@ class Enum extends ParameterSeparator {
             { ...option };
 
         const hashMsg = stat.name + ':' + option.enumType + '.' +
-            stat.EnumEntry.name + ':';
+            stat.EnumItem.name + ':';
 
         const ouidGen = stat.getOUID(option);
 
@@ -274,7 +217,7 @@ class Enum extends ParameterSeparator {
         names.forEach(([name, givenIndex], nr) => {
             const index = getIndex(countType, givenIndex, nr);
             const ouid = ouidGen.next().value;
-            const enumEntry = new stat.EnumEntry(name, ouid, index);
+            const enumEntry = new stat.EnumItem(name, ouid, index);
             stat.GetProperty(enumEntry, 'countType', countType, false);
             stat.GetProperty(enumEntry, 'enumType', enumType, false);
             stat.GetProperty(enumEntry, 'enumObject', this, false);
@@ -297,7 +240,7 @@ class Enum extends ParameterSeparator {
 
     *[Symbol.iterator]() {
         for (const [key, value] of Object.entries(this)) {
-            if (value instanceof this.constructor.EnumEntry) {
+            if (value instanceof this.constructor.EnumItem) {
                 yield { key: key, value: value };
             }
         }
@@ -309,12 +252,12 @@ class Enum extends ParameterSeparator {
      * 
      * @param {function} callback
      *   @param {any} key 
-     *    Enthält den Namen oder den Index des EnumEntry  
-     *   @param {EnumEntry} value
-     *    Object der Klasse EnumEntry 
+     *    Enthält den Namen oder den Index des EnumItem  
+     *   @param {EnumItem} value
+     *    Object der Klasse EnumItem 
      *   @param {Integer} index 
      *    Index des Elements aus dem Array, über welches 
-     *    gerade iteriert wird, entspricht nicht dem Index des EnumEntry.
+     *    gerade iteriert wird, entspricht nicht dem Index des EnumItem.
      *   @param {Enum} Enum
      *    Referenz auf die Aufzählung, die gerade iteriert wird
      * @optional {Object} thisArg 
@@ -324,7 +267,7 @@ class Enum extends ParameterSeparator {
     forEach(callback, thisArg) {
         let i = 0;
         for (const [key, value] of Object.entries(this)) {
-            if (value instanceof this.constructor.EnumEntry) {
+            if (value instanceof this.constructor.EnumItem) {
                 callback.call(thisArg, key, value, i, this)
                 i++;
             }

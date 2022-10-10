@@ -97,9 +97,11 @@ QUnit.module(`Enum-Klasse testen`, hooks => {
     startNumber: StartIndex
   };
 
-  const Galaxy = new Enum('option', GalaxyOptions, expectedNames);
+  const expectedNames = [EnterpriseTmpl, YamatoTmpl, OdysseyTmpl];
+
+  const Galaxy = new Enum('option', GalaxyOptions, ...expectedNames);
   const AndromedaOptions = {option: true, ...GalaxyOptions};
-  const Andromeda = new Enum(AndromedaOptions, expectedNames);
+  const Andromeda = new Enum(AndromedaOptions, ...expectedNames);
   console.dir(Andromeda);
 
   const {Enterprise, Yamato, Odyssey} = Galaxy;
@@ -183,16 +185,16 @@ QUnit.module(`Enum-Klasse testen`, hooks => {
     assert.ok((Odyssey === Galaxy.Odyssey), 
       `const Odyssey(${+Odyssey}) === Galaxy.Odyssey(${1*Galaxy.Odyssey}) OK`);
 
-    assert.ok((Galaxy.Enterprise.uid < Galaxy.Yamato.uid), 
-      `Galaxy.Enterprise.uid(${Galaxy.Enterprise.uid}) < Galaxy.Yamato.uid(${Galaxy.Yamato}) OK`);
-    assert.ok((Galaxy.Odyssey.uid > Galaxy.Yamato.uid), 
-      `Galaxy.Odyssey.uid(${Galaxy.Odyssey.uid}) > Galaxy.Yamato.uid(${Galaxy.Yamato}) OK`);
-    assert.ok((Enterprise.uid < Galaxy.Yamato.uid), 
-      `const Enterprise.uid(${Enterprise.uid}) < Galaxy.Yamato.uid(${Galaxy.Yamato}) OK`);    
-    assert.ok((Odyssey.uid > Galaxy.Yamato.uid), 
-      `const Odyssey.uid(${Odyssey.uid}) > Galaxy.Yamato.uid(${Galaxy.Yamato}) OK`);
-    assert.ok((Odyssey.uid === Galaxy.Odyssey.uid), 
-      `const Odyssey.uid(${Odyssey.uid}) === Galaxy.Odyssey.uid(${Galaxy.Odyssey}) OK`);
+    assert.ok((Galaxy.Enterprise.ouid < Galaxy.Yamato.ouid), 
+      `Galaxy.Enterprise.uid(${Galaxy.Enterprise.ouid}) < Galaxy.Yamato.uid(${Galaxy.Yamato.ouid}) OK`);
+    assert.ok((Galaxy.Odyssey.ouid > Galaxy.Yamato.ouid), 
+      `Galaxy.Odyssey.uid(${Galaxy.Odyssey.ouid}) > Galaxy.Yamato.uid(${Galaxy.Yamato.ouid}) OK`);
+    assert.ok((Enterprise.ouid < Galaxy.Yamato.ouid), 
+      `const Enterprise.uid(${Enterprise.ouid}) < Galaxy.Yamato.uid(${Galaxy.Yamato.ouid}) OK`);    
+    assert.ok((Odyssey.ouid > Galaxy.Yamato.ouid), 
+      `const Odyssey.uid(${Odyssey.ouid}) > Galaxy.Yamato.uid(${Galaxy.Yamato.ouid}) OK`);
+    assert.ok((Odyssey === Galaxy.Odyssey), 
+      `const Odyssey.uid(${Odyssey}) === Galaxy.Odyssey.uid(${Galaxy.Odyssey}) OK`);
     
     assert.equal((Enterprise | Yamato), 12, 
       `${Enterprise.name}.index: ${+Enterprise} | ${Yamato.name}.index: ${+Yamato} korrekt 12`);
