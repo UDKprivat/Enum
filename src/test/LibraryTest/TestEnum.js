@@ -26,102 +26,60 @@
 
 QUnit.module(`Enum-Klasse testen`, hooks => {
 
-  const [EnterpriseTmpl, YamatoTmpl, OdysseyTmpl] = [
-    'Enterprise', 'Yamato', 'Odyssey'];
+  const [EnumTypeTmpl, EnterpriseTmpl, YamatoTmpl, OdysseyTmpl] = [
+    'Galaxy', 'Enterprise', 'Yamato', 'Odyssey'];
 
-    const tmpl = (optBbj) => {
-      return [optBbj, Object.entries(optBbj)[0]];
-    };
-    const desc = (tmpl) => {
-        return `${tmpl[1][0]}: '${tmpl[1][1]}'`;  
-    };
-    const [OptionTmpl, EnumTypeTmpl, cryptoTmpl, countTypTmpl, IDTypeTmpl] =
-      [
-        tmpl({ option: 'option' }), // {!== null} dummy  
-        tmpl({ enumType: 'Galaxy' }), // {string} typeName 
-        tmpl({ crypto: true }), // |false 
-        tmpl({ countType: Enum.COUNT }),// Enum.<AUTO|COUNT> 
-        // tmpl({ idType: Enum.HASH })// Enum.<HASH|UUID|UID> 
-      ];
-
-      const ToBuildOptions = [ //  immer ...ToBuildConstants[x]
-      {
-        desc: `'${OptionTmpl[0].option}', {${desc(EnumTypeTmpl)}}`,
-        template: [OptionTmpl[0].option, { ...EnumTypeTmpl[0] }]
-      },
-      {
-        desc: `{ ${desc(OptionTmpl)}, ${desc(EnumTypeTmpl)} }`,
-        template: [{...OptionTmpl[0], ...EnumTypeTmpl[0]}]
-      },
+  const tmpl = (optBbj) => {
+    return [optBbj, Object.entries(optBbj)[0]];
+  };
+  const [OptionTmpl] =
+    [
+      tmpl({ cause: 'param' }), // {!== null} dummy  
+      tmpl({ indexType: Enum.AUTO }),// Enum.<AUTO|SERIES|BINARY> 
+      tmpl({ indexType: Enum.BINARY }),// Enum.<AUTO|SERIES|BINARY> 
     ];
 
-    const ToBuildConstants = [ // immer ...ToBuildConstants[x].template
-      {
-        desc: `' ${EnterpriseTmpl}', ... `,
-        template: [EnterpriseTmpl, YamatoTmpl, OdysseyTmpl],
-        expected: [[EnterpriseTmpl, 0], [YamatoTmpl, 1], [OdysseyTmpl, 2]]
-      },
-      {
-        desc: `'[ { ${EnterpriseTmpl}: 23 , ... }]`,
-        template: [{ [EnterpriseTmpl]: 23, [YamatoTmpl]: 29, [OdysseyTmpl]: 31 }],
-        expected: [[EnterpriseTmpl, 23], [YamatoTmpl, 29], [OdysseyTmpl, 31]]
-      },
-      {
-        desc: `[ '${EnterpriseTmpl}', ... ], `,
-        template: [[EnterpriseTmpl, YamatoTmpl, OdysseyTmpl]],
-        expected: [[EnterpriseTmpl, 0], [YamatoTmpl, 1], [OdysseyTmpl, 2]]
-      },
-      {
-        desc: ` Set(['${EnterpriseTmpl}', ... ]) `,
-        template: [new Set([EnterpriseTmpl, YamatoTmpl, OdysseyTmpl])],
-        expected: [[EnterpriseTmpl, 0], [YamatoTmpl, 1], [OdysseyTmpl, 2]]
-      },
-      {
-        desc: ` [['${EnterpriseTmpl}', 3], ...] `,
-        template: [[[[EnterpriseTmpl, 3], [YamatoTmpl, 5], [OdysseyTmpl, 7]]]],
-        expected: [[EnterpriseTmpl, 3], [YamatoTmpl, 5], [OdysseyTmpl, 7]]
-      },
-      {
-        desc: ` Map([['${EnterpriseTmpl}', 3], ...] `,
-        template: [new Map([[EnterpriseTmpl, 3], [YamatoTmpl, 5], [OdysseyTmpl, 7]])],
-        expected: [[EnterpriseTmpl, 3], [YamatoTmpl, 5], [OdysseyTmpl, 7]]
-      },
-    ];
-
-  const EnumType = 'Galaxy';
+  const EnumType = EnumTypeTmpl;
   const CountType = Enum.BINARY;
   const StartIndex = 2;
   const GalaxyOptions = {
-    enumType: EnumType, 
-    countType: CountType, 
-    startNumber: StartIndex
+    ...OptionTmpl[0],
+    indexType: CountType,
+    startIndex: StartIndex
   };
 
   const expectedNames = [EnterpriseTmpl, YamatoTmpl, OdysseyTmpl];
 
-  const Galaxy = new Enum('option', GalaxyOptions, ...expectedNames);
-  const AndromedaOptions = {option: true, ...GalaxyOptions};
-  const Andromeda = new Enum(AndromedaOptions, ...expectedNames);
-  console.dir(Andromeda);
+  const jsonTestStr = '{"Enum":[{"cause":"json","indexType":"BINARY"},"jsonTest",[{"Enterprise":[1,"22D5-7DA5-5C66-4FCA-6C42-0DBE"]},{"Yamato":[2,"546D-7135-4BD6-40EF-6856-BC42"]},{"Odyssey":[4,"688C-7BB5-D776-49A0-6F97-6A19"]}]]}';
 
-  const {Enterprise, Yamato, Odyssey} = Galaxy;
-  const constObj = [Enterprise, Yamato, Odyssey];
+  const AndromedaOptions = { ...OptionTmpl[0], ...GalaxyOptions };
+  const Andromeda = new Enum(AndromedaOptions, 'Andromeda', expectedNames);
 
-  const IndexTypes = new Enum([['auto', 0], ['binary', 1], ['count', 2]])
-  console.log(IndexTypes);
-  console.log ('Enterprise === Enterprise',  Enterprise === Andromeda.Enterprise);
+  const Galaxy = new Enum(GalaxyOptions, EnumTypeTmpl, expectedNames);
+
+  const { Enterprise, Yamato, Odyssey } = Galaxy;
+  const GalaxyItems = [Enterprise, Yamato, Odyssey];
 
   QUnit.test('Anlegen und Überprüfen der Enum-Funktionen', function (assert) {
-        
-    for(const obj of constObj) {
-      assert.ok(constObj.includes(obj), 
-          `Das Destukurieren mit Konstanten '${obj.name}' hat funktioniert`);
+
+    assert.equal(Enum.getConst('Foo')?.name, 'AUTO', 'Unbekannter Konstantenname \'Foo\' ergibt "Enum.AUTO"');
+    assert.equal(Enum.getConst(Enum.SERIES)?.name, 'SERIES', 'ENUM.SERIES ergibt "Enum.SERIES"');
+    assert.equal(Enum.getConst('BINARY')?.name, 'BINARY', '"BINARY" ergibt "Enum.BINARY"');
+
+    assert.ok(Enum['Andromeda'], 'Der EnumType ist als statische Konstante angelegt.');
+
+    assert.deepEqual(JSON.stringify(Enum.parse(jsonTestStr)), jsonTestStr,
+      'JSON-Testobjekt korrekt eingelesen und wieder zum JSON-String gewandelt.');
+    
+    for (const obj of GalaxyItems) {
+      assert.ok(Galaxy[obj.name], `Das Destrukturieren mit Konstanten '${obj.name}' hat funktioniert`);
     }
 
     assert.equal(Galaxy.Enterprise.name, expectedNames[0],
       `enumEntry ${expectedNames[0]} angelegt!`);
-    assert.propContains(Galaxy.Enterprise, 
-      {name: expectedNames[0], index: 2 ** StartIndex, enumType: "Galaxy"}, 
+
+    assert.propContains(Galaxy.Enterprise,
+      { name: expectedNames[0], index: 2 ** StartIndex, enumType: "Galaxy" },
       `Name und Index ist korrekt vorhanden`);
 
     assert.equal(Galaxy[expectedNames[1]].name, expectedNames[1],
@@ -129,75 +87,85 @@ QUnit.module(`Enum-Klasse testen`, hooks => {
     assert.equal(Galaxy[expectedNames[2]].name, expectedNames[2],
       `enumEntry ${expectedNames[2]} angelegt!`);
 
-    assert.ok(([...Galaxy] instanceof Array), 'Iterator ist OK!');
-    assert.equal([...Galaxy].length, expectedNames.length * 2, 'Array-Anzahl ist OK!');
+    assert.ok(Array.isArray([...Galaxy]), 'Iterator ist OK!');
+    assert.equal([...Galaxy].length, expectedNames.length, 'Array-Anzahl ist OK!');
 
     var uuidTmp = window.crypto.randomUUID();
-    Enterprise.value = uuidTmp;
-    assert.equal(Enterprise.value, uuidTmp, 
-      `Die UUID <${uuidTmp}> ist in Enterprise.value gespeichert`);
-    
+    Enterprise.store = uuidTmp;
+    assert.equal(Enterprise.store, uuidTmp,
+      `Die UUID <${uuidTmp}> ist in Enterprise.store gespeichert`);
+
     uuidTmp = window.crypto.randomUUID();
-    Yamato.value = uuidTmp;
-    assert.equal(Yamato.value, uuidTmp, 
-      `Die UUID <${uuidTmp}> ist in Yamato.value gespeichert`);
+    Yamato.store = uuidTmp;
+    assert.equal(Yamato.store, uuidTmp,
+      `Die UUID <${uuidTmp}> ist in Yamato.store gespeichert`);
 
-    assert.notEqual(Enterprise.value, Yamato.value,
-      'Beide oberen Konstanten haben undterschiedliche Values');
-
-    assert.equal(Yamato.enumType, EnumType, 
+    assert.notEqual(Enterprise.store, Yamato.store,
+      'Enterprise und Yamato haben unterschiedliche Values');
+;
+    assert.equal(Yamato.enumType, EnumType,
       'In dem Enum-Objekt ist der korrekte enumType gesichert!');
     assert.deepEqual(Yamato.enumObject, Galaxy,
       'In dem Enum-Objekt ist das erstellte Enum-Objekt gesichert!');
-  
-    assert.throws(function () { Galaxy.Enterprise = 1000; }, 
+
+    assert.throws(function () { Galaxy.Enterprise = 1000; },
       'Der Enum-Entry kann nicht mit einem neuem Wert überschrieben werden.');
     assert.throws(function () { Enterprise = 1000; },
       'Der Enum-Entry als Konstante kann nicht mit einem neuem Wert überschrieben werden.');
   });
 
-  QUnit.test('Überprüfen der EnumEntries als Konstanten', function (assert) {
+  QUnit.test('Überprüfen der EnumItem als Konstanten', function (assert) {
 
     let ConstantFunc = {
       [Enterprise]() {
         assert.ok(true, `[${Enterprise.name}]() as [${Enterprise}]()`);
       },
       [Yamato]() {
-        assert.ok(true, `[${Yamato.name}]() as  [${Yamato}]()`);
+        assert.ok(true, `[${Yamato.name}]() as [${Yamato}]()`);
       },
       [Odyssey]() {
         assert.ok(true, `[${Odyssey.name}]() as [${Odyssey}]()`);
       }
     };
 
-    for(const obj of constObj) {
+    for (const obj of GalaxyItems) {
       ConstantFunc[obj]();
     }
 
-    assert.ok((Galaxy.Enterprise < Galaxy.Yamato), 
+    assert.ok((Galaxy.Enterprise < Galaxy.Yamato),
       `Galaxy.Enterprise(${+Galaxy.Enterprise}) < Galaxy.Yamato(${+Galaxy.Yamato}) OK`);
-    assert.ok((Galaxy.Odyssey > Galaxy.Yamato), 
-      `Galaxy.Odyssey(${Galaxy.Odyssey*1}) > Galaxy.Yamato(${+Galaxy.Yamato}) OK`);
-    assert.ok((Enterprise < Galaxy.Yamato), 
-      `const Enterprise(${+Enterprise}) < Galaxy.Yamato(${+Galaxy.Yamato}) OK`);    
-    assert.ok((Odyssey > Galaxy.Yamato), 
+    assert.ok((Galaxy.Odyssey > Galaxy.Yamato),
+      `Galaxy.Odyssey(${Galaxy.Odyssey * 1}) > Galaxy.Yamato(${+Galaxy.Yamato}) OK`);
+    assert.ok((Enterprise < Galaxy.Yamato),
+      `const Enterprise(${+Enterprise}) < Galaxy.Yamato(${+Galaxy.Yamato}) OK`);
+    assert.ok((Odyssey > Galaxy.Yamato),
       `const Odyssey(${+Odyssey}) > Galaxy.Yamato(${+Galaxy.Yamato}) OK`);
-    assert.ok((Odyssey === Galaxy.Odyssey), 
-      `const Odyssey(${+Odyssey}) === Galaxy.Odyssey(${1*Galaxy.Odyssey}) OK`);
+    assert.ok((Odyssey === Galaxy.Odyssey),
+      `const Odyssey(${+Odyssey}) === Galaxy.Odyssey(${1 * Galaxy.Odyssey}) OK`);
 
-    assert.ok((Galaxy.Enterprise.ouid < Galaxy.Yamato.ouid), 
-      `Galaxy.Enterprise.uid(${Galaxy.Enterprise.ouid}) < Galaxy.Yamato.uid(${Galaxy.Yamato.ouid}) OK`);
-    assert.ok((Galaxy.Odyssey.ouid > Galaxy.Yamato.ouid), 
-      `Galaxy.Odyssey.uid(${Galaxy.Odyssey.ouid}) > Galaxy.Yamato.uid(${Galaxy.Yamato.ouid}) OK`);
-    assert.ok((Enterprise.ouid < Galaxy.Yamato.ouid), 
-      `const Enterprise.uid(${Enterprise.ouid}) < Galaxy.Yamato.uid(${Galaxy.Yamato.ouid}) OK`);    
-    assert.ok((Odyssey.ouid > Galaxy.Yamato.ouid), 
-      `const Odyssey.uid(${Odyssey.ouid}) > Galaxy.Yamato.uid(${Galaxy.Yamato.ouid}) OK`);
-    assert.ok((Odyssey === Galaxy.Odyssey), 
-      `const Odyssey.uid(${Odyssey}) === Galaxy.Odyssey.uid(${Galaxy.Odyssey}) OK`);
-    
-    assert.equal((Enterprise | Yamato), 12, 
+    assert.ok((Galaxy.Enterprise.esid < Galaxy.Yamato.esid),
+      `Galaxy.Enterprise.esid(${Galaxy.Enterprise.esid}) < Galaxy.Yamato.esid(${Galaxy.Yamato.esid}) OK`);
+    assert.ok((Galaxy.Odyssey.esid > Galaxy.Yamato.esid),
+      `Galaxy.Odyssey.esid(${Galaxy.Odyssey.esid}) > Galaxy.Yamato.esid(${Galaxy.Yamato.esid}) OK`);
+    assert.ok((Enterprise.esid < Galaxy.Yamato.esid),
+      `const Enterprise.esid(${Enterprise.esid}) < Galaxy.Yamato.esid(${Galaxy.Yamato.esid}) OK`);
+    assert.ok((Odyssey.esid > Galaxy.Yamato.esid),
+      `const Odyssey.esid(${Odyssey.esid}) > Galaxy.Yamato.esid(${Galaxy.Yamato.esid}) OK`);
+    assert.ok((Odyssey === Galaxy.Odyssey),
+      `const Odyssey.esid(${Odyssey}) === Galaxy.Odyssey.esid(${Galaxy.Odyssey}) OK`);
+
+    assert.equal(Andromeda.toString(), '[object Enum]',
+      `die Methode 'Andromeda.toString()' arbeitet korrekt.`);
+    assert.equal(Andromeda.Enterprise.toString(), '[object EnumItem]',
+      `die Methode 'Andromeda.Enterprise.toString()' arbeitet korrekt.`);
+
+    assert.equal(`${Andromeda}`, 'Andromeda', `Enum als String ergibt den EnumTyp als String.`);
+    assert.equal((+Andromeda), 0, `Enum als Zahl ergibt immer 0.`);
+    assert.equal(Object.prototype.toString.call(Andromeda), '[object Enum]');  
+
+    assert.equal((Enterprise | Yamato), 12,
       `${Enterprise.name}.index: ${+Enterprise} | ${Yamato.name}.index: ${+Yamato} korrekt 12`);
-    
+
   });
+
 });
