@@ -64,13 +64,13 @@ Der Enum-Name (*enumType*) ist die Bezeichnung und der Name des Enum-Objektes.
 #### ***label***
 Eine Liste mit den Namen für die Bezeichnung der EnumEinträgen:
 Sieben Datentypen können als Liste zur Erzeugung genutzt werden: 
-  - StringListe: `... ,'FOO', 'Bar', ...)`
+  - StringListe: `... ,'FOO', 'Bar', ...`
   - StringArray: `..., ['FOO', 'Bar', ...]`
-  - Set: `..., Set(['FOO', 'Bar', ...])`
+  - Set: `..., Set(['FOO', 'Bar', ...]`
   - Array\[key, index]: `..., [['FOO', 1], ['Bar', 3], ...]`
-  - Map: `..., Map([['FOO', 1], ['Bar', 3], ...]))`
-  - Object: `..., {FOO: 2, Bar: 4, ...})`
-  - Object: `..., {FOO: [2, id], Bar: [4, id], ...})`<br>
+  - Map: `..., Map([['FOO', 1], ['Bar', 3], ...])`
+  - Object: `..., {FOO: 2, Bar: 4, ...}`
+  - Object: `..., {FOO: [2, id], Bar: [4, id], ...}`<br>
     Dieses Format wird für den JSON-Import genutzt.
   
 Die DatenTypen können in zwei Gruppen aufgeteilt werden:
