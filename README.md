@@ -192,7 +192,7 @@ const Colors = new Enum({cause: 'param', countTyp: Enum.BINARY}, 'colors', ['red
 + `console.log(Colors.red.esid) // '55-SAES-45FD-ENUM/8-633B-7055-5E-8'` ESID des Items
 + `console.log(Colors.green.id) // '55-SAES-45FD-ENUM/8-633B-7055-5E-8'` ID (ESID)
 + `Colors.green.serializedEnum`<br>
-  gibt das gibt das Item als ein Objekt für das für JSON.stringify vorbereitete ist zurück.
+  gibt das gibt das Item als ein Objekt, das für JSON.stringify vorbereitete ist, zurück.
 + `Colors.blue.store = {42: 'die Frage nach dem Leben, dem Universum und dem ganzen Rest'}`
 + `console.log(Colors.blue.store.42) // 'die Frage nach dem Leben, dem Universum und dem ganzen Rest'`<br>
 gibt den Inhalt des Speichers des EnumItems zurück.
